@@ -1,0 +1,7 @@
+<?php
+define('BASE_PATH', dirname(__DIR__));
+require_once BASE_PATH . '/controllers/CartController.php';
+require_once BASE_PATH . '/config/databaseconnection.php';
+
+$cartController = new CartController($con);
+$cartController->expireCarts();
