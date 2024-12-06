@@ -153,7 +153,7 @@ class CartController
         }
 
         // Step 2: Retrieve all items in the cart
-        $query = "SELECT ci.ID AS cart_item_id, p.p_name AS product_name, ci.quantity, ci.total_price, p.price AS product_price
+        $query = "SELECT ci.ID AS cart_item_id, p.p_name AS product_name,p.s_quantity, ci.quantity, ci.total_price, p.price AS product_price
                   FROM cart_items ci 
                   JOIN products p ON ci.product_id = p.id
                   WHERE ci.cart_id = ?";
@@ -164,14 +164,19 @@ class CartController
             $result = $stmt->get_result();
 
             // Step 3: Fetch all cart items
+            $cart_price = 0;
             $cartItems = [];
             while ($row = $result->fetch_assoc()) {
+                $cart_price +=  $row['total_price'];
+
                 $cartItems[] = [
                     'cart_item_id' => $row['cart_item_id'],
                     'product_name' => $row['product_name'],
                     'quantity' => $row['quantity'],
                     'total_price' => $row['total_price'],
-                    'product_price' => $row['product_price']
+                    'product_price' => $row['product_price'],
+                    'stock_quantity' => $row['s_quantity'],
+                    'cart_price' => $cart_price
                 ];
             }
 

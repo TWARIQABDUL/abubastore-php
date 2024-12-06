@@ -4,6 +4,7 @@ require_once BASE_PATH . '/config/databaseconnection.php';
 require_once BASE_PATH . '/controllers/UserController.php';
 require_once BASE_PATH . '/middleware/AuthMiddleware.php';
 require_once BASE_PATH . '/controllers/CartController.php';
+require_once BASE_PATH . '/models/User.php';
 
 $productController = new ProductController($con);
 $userController = new UserController($con);
@@ -11,7 +12,7 @@ $cartController = new CartController($con);
 
 $uri = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
 $method = $_SERVER['REQUEST_METHOD'];
-echo $uri;
+// echo $uri;
 switch ($uri) {
     case 'abuba-ecommerce-backend/product':
         if ($method === 'GET') {
@@ -82,7 +83,7 @@ switch ($uri) {
     case 'abuba-ecommerce-backend/add-to-cart':
         if ($method === 'POST') {
             $data = json_decode(file_get_contents('php://input'), true);
-
+            // print_r($data);
             $cartController->addToCart($data['user_id'], $data['product_id'], $data['quantity']);
         } else {
             http_response_code(405); // Method Not Allowed
@@ -94,8 +95,8 @@ switch ($uri) {
         break;
     case 'abuba-ecommerce-backend/mycart':
         if ($method === 'GET') {
-            $data = json_decode(file_get_contents('php://input'), true);
-            $cart = $cartController->getCartItems($data['user_id']);
+            // $data = json_decode(file_get_contents('php://input'), true);
+            $cart = $cartController->getCartItems($_GET['user_id']);
             echo $cart;
         } else {
             http_response_code(405); // Method Not Allowed
@@ -226,6 +227,19 @@ switch ($uri) {
             ]);
         }
         break;
+        case 'abuba-ecommerce-backend/defaul-user':
+            if ($method === 'POST') {
+                createGuestUser($con);
+                // $data = json_decode(file_get_contents('php://input'), true);
+                // $cartController->checkout($data['user_id']);
+            } else {
+                http_response_code(405); // Method Not Allowed
+                echo json_encode([
+                    "error" => "Method Not Allowed",
+                    "message" => "You cannot use $method on this endpoint"
+                ]);
+            }
+            break;
     default:
         http_response_code(404);
         echo json_encode(["error" => "Endpoint not found"]);
